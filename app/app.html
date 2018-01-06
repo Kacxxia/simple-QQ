@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Hello Electron React!</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.12/semantic.min.css"></link>
+    <style>
+        * {
+            font-family: "微软雅黑";
+        }
+        .d-flex {
+            display: flex;
+        }
+
+        .flex-column {
+            flex-direction: column;
+        }
+
+        .justify-content-between {
+            justify-content: space-between;
+        }
+
+        .justify-content-center {
+            justify-content: center;
+        }
+
+        .justify-content-start {
+            justify-content: flex-start;
+        }
+        
+        .justify-content-end {
+            justify-content: flex-end;
+        }
+
+        .align-items-center {
+            align-items: center;
+        }
+
+        .draggable {
+            -webkit-app-region: drag;
+        }
+
+        textarea:focus, input:focus {
+            outline: none;
+        }
+        textarea {
+            resize: none;
+        }
+        .no-drag {
+            -webkit-app-region: no-drag;
+        }
+        .emoji:hover {
+            background-color: lightgrey;
+        }
+        .triangle-after::after {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 16px solid transparent;
+            border-left: 10px solid lightblue;
+            border-bottom: 16px solid transparent;
+            position: absolute;
+            top: calc(50% - 16px);
+            right: -8px;
+        }
+        .triangle-before::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-top: 16px solid transparent;
+            border-right: 10px solid grey;
+            border-bottom: 16px solid transparent;
+            top: 50%;
+            left: -8px;
+        }
+
+    </style>
+    <script>
+        (function () {
+            if (!process.env.HOT) {
+                const link = document.createElement('link');
+                link.rel = 'stylesheet';
+                link.href = './dist/style.css';
+                // HACK: Writing the script path should be done with webpack
+                document.getElementsByTagName('head')[0].appendChild(link);
+            }
+        }());
+
+    </script>
+</head>
+
+<body >
+    <div id="root"></div>
+    <script>
+        {
+            const scripts = [];
+
+            // Dynamically insert the DLL script in development env in the
+            // renderer process
+            if (process.env.NODE_ENV === 'development') {
+                scripts.push('../dll/renderer.dev.dll.js');
+            }
+
+            // Dynamically insert the bundled app script in the renderer process
+            const port = process.env.PORT || 1212;
+            scripts.push(
+                (process.env.HOT) ?
+                'http://localhost:' + port + '/dist/renderer.dev.js' :
+                './dist/renderer.prod.js'
+            );
+
+            document.write(
+                scripts
+                .map(script => '<script defer src="' + script + '"><\/script>')
+                .join('')
+            );
+        }
+
+    </script>
+    <script>
+        worker = new Worker('ssqpworker.js')
+
+    </script>
+</body>
+
+</html>
