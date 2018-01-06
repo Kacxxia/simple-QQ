@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import { Button, Popup } from 'semantic-ui-react'
 
 import EmojiPanel from './EmojiPanel'
-import { addEmoji } from '../actions/main'
+import { addEmoji } from '../actions/mainAction'
 
 function ChatTool({onAddEmoji, onSendFile, onSendImage}){
     return (

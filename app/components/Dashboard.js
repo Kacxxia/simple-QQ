@@ -13,7 +13,7 @@ import {
     sendImage, 
     sendFile,
     confirmReceiveFile
-} from '../actions/main'
+} from '../actions/mainAction'
 import ChatArea from './ChatArea'
 
 const Dashboard = ({

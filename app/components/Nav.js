@@ -4,7 +4,7 @@ import { createSelector } from 'reselect'
 import { Menu, Tab, Label, Card } from 'semantic-ui-react'
 
 import RedPoint from './RedPoint'
-import { goChatting } from '../actions/main'
+import { goChatting } from '../actions/mainAction'
 
 const Nav = ({
     friendList,

@@ -15,7 +15,7 @@ import {
     SEND_GROUP_CHAT_MESSAGE,
     SEND_FRIEND_FILE,
     SEND_GROUP_FILE
-} from '../actions/main'
+} from '../actions/mainAction'
 
 const INITIAL_STATE = {
     type: 'none', // none/friend/group/system
