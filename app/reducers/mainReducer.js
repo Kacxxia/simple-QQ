@@ -14,7 +14,7 @@ import {
     RECEIVE_FRIEND_GO_ONLINE,
     RECEIVE_FRIEND_GO_OFFLINE,
     ADD_FRIEND_TO_LIST
-} from '../actions/main'
+} from '../actions/mainAction'
 
 
 const INITIATE_STATE = {
