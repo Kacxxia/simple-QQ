@@ -1,6 +1,6 @@
 import { push } from 'react-router-redux'
 import { ssqpSend, serverIpPort, enterInMainPage } from './index'
-import { INITIATE_DB } from './main'
+import { INITIATE_DB } from './mainAction'
 import { CMD_REGIST, CMD_LOGIN } from '../ssqp/utils'
 
 export const LOGIN_FAILED = 'login_failed',

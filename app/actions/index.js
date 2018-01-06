@@ -26,7 +26,7 @@ import {
      RECEIVE_CONFIRM_ADD_FRIEND,
      RECEIVE_FRIEND_GO_ONLINE,
      RECEIVE_FRIEND_GO_OFFLINE
- } from './main'
+ } from './mainAction'
 
 const callbackList = {
     // uuid: callback
