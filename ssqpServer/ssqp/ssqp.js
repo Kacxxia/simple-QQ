@@ -68,10 +68,10 @@ class ssqp extends EventEmitter {
             try {
                 this.data = data
                 while(this.data.length > 0 ) {
-                    while (this.isReadingHeader && (this.data.length > 0) && (this.packetHeader.length < 4)) {
-                        let packetHeader = this.data.slice(0, 4)
+                    while (this.isReadingHeader && (this.data.length > 0) && (this.packetHeader.length < 8)) {
+                        let packetHeader = this.data.slice(0, 8)
                         this.packetHeader = packetHeader
-                        this.data = this.data.slice(4, this.data.length)
+                        this.data = this.data.slice(8, this.data.length)
                         this.cmd = packet.extractField(packetHeader, 'command')
                         this.descriptorLength = packet.extractField(packetHeader, 'descriptorLength')
                         this.dataLength = packet.extractField(packetHeader, 'dataLength')

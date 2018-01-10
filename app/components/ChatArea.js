@@ -4,15 +4,16 @@ import ChatTool from './ChatTool'
 
 
 class ChatArea extends Component {
-    scrollToBottom(){
-        console.log(this)
-        this.messageEnd.scrollIntoView({behavior: "smooth"})
-    }
+
     componentDidMount() {
         this.scrollToBottom()
     }
     componentDidUpdate() {
         this.scrollToBottom()
+    }
+    scrollToBottom(){
+        console.log(this)
+        this.messageEnd.scrollIntoView({behavior: "smooth"})
     }
     render(){
         return (
@@ -32,16 +33,16 @@ class ChatArea extends Component {
                         } else {
                             name = '我'
                         }
-                        const ConfirmReceiveFileButton = his.messageType === 'file' ? (
+                        const ConfirmReceiveFileButton = (his.messageType === 'file' && !his.isSelf) ? (
                             <Button onClick={() => this.props.onConfirmReceiveFile(his.fileId)}>确定接收</Button>
-                        ) : null
+                        ) : ''
                         return (
                             <div key={`${index}`} className={`d-flex ${posClass} chat-record-self ${triangleClass}`} style={{marginBottom: 16, position: 'relative'}}>
                                 <div style={{borderRadius: 4, backgroundColor: color, display:'inline-block', padding: 16}}>
                                     <div>{name}</div>
                                     <div>{his.time}</div>
                                     <div>{content}</div>
-                                    <ConfirmReceiveFileButton />
+                                    {ConfirmReceiveFileButton}
                                 </div>
                             </div>
                         )

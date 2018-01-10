@@ -97,6 +97,10 @@ export function confirmAddFriend(selfId, tarInfo) {
                     type: ADD_FRIEND_TO_LIST,
                     payload: tarInfo
                 })
+                dispatch({
+                    type: INITIATE_FRIEND_CHAT_RECORD,
+                    id: tarInfo.userId
+                })
             } else {
                 alert('confirm add friend error!!')
             }
@@ -134,17 +138,31 @@ function sendSth(dispatch, cmd, targetType, messageType, tarInfo, selfId, fileIn
         groupId,
         fileInfo
     }
-    const content = cmd !== CMD_FILE ? data : `你发送了文件${fileInfo.filename}`
+
+    let content 
+    switch(messageType) {
+        case 'file':
+            content = `你发送了文件${fileInfo.filename}`
+            break;
+        case 'image':
+            content = data.toString('base64')
+            break;
+        case 'message':
+            content = data.toString()
+            break;
+    }
     const localMessagePayload = [{
         isSelf: true,
         time: convertDate(new Date()),
         messageId: uuid(),
         content,
         messageType,
-        userId: tarInfo.userId,
+        userId: selfId,
+        targetUserId: tarInfo.userId,
         groupId
     }]
     dispatch({type: actionType, payload: localMessagePayload})
+    alert(data)
     ssqpSend(ipPort, cmd, descriptor, data)
     .then(() => console.log('send sth success'))
     .catch((err) => alert(err))
@@ -154,7 +172,8 @@ function sendSth(dispatch, cmd, targetType, messageType, tarInfo, selfId, fileIn
 export function sendChatMessage(targetType, tarInfo, selfId) {
     return (dispatch, getStore) => {
         const { chatInput } = getStore().chat
-        sendSth(dispatch, CMD_MESSAGE, targetType, 'message', tarInfo, selfId, undefined, chatInput)
+        alert(chatInput)
+        sendSth(dispatch, CMD_MESSAGE, targetType, 'message', tarInfo, selfId, undefined, Buffer.from(chatInput))
     }
 }
 
@@ -167,8 +186,7 @@ export function sendImage(targetType, tarInfo, selfId) {
         console.log(`file path is ${filePaths[0]}`)
         fs.readFile(filePaths[0], (err, data) => {
             if (err) throw new Error(err)
-            const imgBase64 = data.toString('base64')
-            sendSth(dispatch, CMD_MESSAGE, targetType, 'image', tarInfo, selfId, undefined, imgBase64) 
+            sendSth(dispatch, CMD_MESSAGE, targetType, 'image', tarInfo, selfId, undefined, data) 
         })
         })
     )

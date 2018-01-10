@@ -9,7 +9,7 @@ class ssqp extends EventEmitter {
         this.server = net.createServer((socket) => {
             this.socketInitialize(socket)
             this.listHandler(socket)
-        }).listen(port, () => console.log(`server is listening on ${this.server.address().address}:${this.server.address().port}:${this.server.address().family}`))
+        }).listen(port, '127.0.0.2', () => console.log(`server is listening on ${this.server.address().address}:${this.server.address().port}:${this.server.address().family}`))
     }
 
     async send(socket, ip, port, cmd, descriptor, data) {
@@ -22,7 +22,12 @@ class ssqp extends EventEmitter {
                 data = Buffer.alloc(0)
                 dataLength = 0
             }
-            socket.write(packet.makePacket(cmd, descriptor, dataLength))
+            const p = packet.makePacket(cmd, descriptor, dataLength)
+            console.log('22222222222222222222222')
+            console.log(descriptor)
+            console.log(Buffer.from(JSON.stringify(descriptor)).length)
+            console.log(packet.extractField(p.slice(0, 8), 'descriptorLength'))
+            socket.write(p)
             socket.isFree = socket.write(data)
             return [socket.localAddress, socket.localPort]
         } catch(e) {
@@ -44,7 +49,11 @@ class ssqp extends EventEmitter {
                 }
                 let newSocket = new net.Socket()
                 await new Promise(resolve => {
-                        newSocket.connect(desport, 'localhost', () => resolve())
+                        newSocket.connect({
+                            port: desport, 
+                            host: desip,
+                            localAddress: '127.0.0.2'
+                        }, () => resolve())
                     }
                 )
                 console.log(`new socket is connecting ${desip}:${desport} on local ${newSocket.localAddress}:${newSocket.localPort}`)
@@ -66,17 +75,21 @@ class ssqp extends EventEmitter {
             try {
                 this.data = data
                 while(this.data.length > 0 ) {
-                    while (this.isReadingHeader && (this.data.length > 0) && (this.packetHeader.length < 4)) {
-                        let packetHeader = this.data.slice(0, 4)
-                        this.packetHeader = packetHeader
-                        this.data = this.data.slice(4, this.data.length)
-                        this.cmd = packet.extractField(packetHeader, 'command')
-                        this.descriptorLength = packet.extractField(packetHeader, 'descriptorLength')
-                        this.dataLength = packet.extractField(packetHeader, 'dataLength')
-                        this.isReadingHeader = false
+                    while (this.isReadingHeader && (this.data.length > 0) ) {
+                        const prevPackHeaderLen = this.packetHeader.length
+                        let pac = this.data.slice(0, 8 - prevPackHeaderLen)
+                        this.packetHeader = Buffer.concat([this.packetHeader, pac])
+                        this.data = this.data.slice(8 - prevPackHeaderLen, this.data.length)
+                        if (this.packetHeader.length === 8) {
+                            this.cmd = packet.extractField(this.packetHeader, 'command')
+                            this.descriptorLength = packet.extractField(this.packetHeader, 'descriptorLength')
+                            this.dataLength = packet.extractField(this.packetHeader, 'dataLength')
+                            this.isReadingHeader = false
+                        }
                     }
-                    while((this.data.length > 0) && (this.readedDescriptor.length < this.descriptorLength)) {
+                    while((this.data.length > 0) && (this.readedDescriptor.length < this.descriptorLength)) {   
                         let neededLength = this.descriptorLength - this.readedDescriptor.length
+                        console.log(`need length: ${neededLength}`)
                         this.readedDescriptor = Buffer.concat([this.readedDescriptor, this.data.slice(0, neededLength)])
                         this.data = this.data.slice(neededLength, this.data.length)
                     }
@@ -88,6 +101,8 @@ class ssqp extends EventEmitter {
 
 
                     if ((this.readedDescriptor.length === this.descriptorLength) && (this.readedData.length === this.dataLength)) {
+                        console.log('ttt')
+                        console.log(JSON.parse(this.readedDescriptor.toString()))
                         that.emit('receivePacket', this.cmd, this, JSON.parse(this.readedDescriptor.toString()), this.readedData)
                         this.isReadingHeader = true 
                         this.readedData = Buffer.alloc(0)

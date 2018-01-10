@@ -25,7 +25,8 @@ import {
      RECEIVE_MESSAGE_FROM_GROUP,
      RECEIVE_CONFIRM_ADD_FRIEND,
      RECEIVE_FRIEND_GO_ONLINE,
-     RECEIVE_FRIEND_GO_OFFLINE
+     RECEIVE_FRIEND_GO_OFFLINE,
+     INITIATE_FRIEND_CHAT_RECORD
  } from './mainAction'
 
 const callbackList = {
@@ -42,7 +43,6 @@ export const IO_NORMAL = 'io_normal',
             IO_FAILED = 'io_failed'
 
 export const serverIpPort = ['127.0.0.1', '11111']
-
 export function ssqpSend(ipPort, cmd, descriptor, data) {
     return new Promise((resolve, reject) => {
         try {
@@ -61,7 +61,8 @@ export function ssqpSend(ipPort, cmd, descriptor, data) {
 }
 
 worker.onmessage = function getdata(e) {
-    const { type, cmd, descriptor, data } = e.data
+    const { type, cmd, descriptor, data: d } = e.data
+    const data = Buffer.from(d)
     const id = descriptor.id
     if (type === 'get') {
         if (isDirectUpdate(cmd)) {
@@ -74,6 +75,7 @@ worker.onmessage = function getdata(e) {
                         store.dispatch({
                             type: RECEIVE_FILE_FROM_FRIEND,
                             payload: [{
+                                targetUserId: descriptor.userId,
                                 userId: descriptor.userId,
                                 messageType: 'file',
                                 isSelf: false,
@@ -106,17 +108,21 @@ worker.onmessage = function getdata(e) {
                 }
             } else if (cmd === CMD_MESSAGE) {
                 const messageType = descriptor.messageType
+                console.log('*************-----------')
+                console.log(data)
+                console.log(data.toString())
                 const message = messageType === 'image' ? data.toString('base64') : data.toString()
                 switch (descriptor.type) {
                     case 'friend':
                         store.dispatch({
                             type: RECEIVE_MESSAGE_FROM_FRIEND,
                             payload: [{
-                                type: messageType,
+                                messageType,
                                 isSelf: false,
                                 content: message,
                                 time: convertDate(new Date()),
-                                userId: descriptor.userId
+                                userId: descriptor.userId,
+                                targetUserId: descriptor.userId
                             }]
                         })
                         break;
@@ -126,7 +132,7 @@ worker.onmessage = function getdata(e) {
                             payload: [{
                                 userId: descriptor.userId,
                                 groupId: descriptor.groupId,
-                                type: messageType,
+                                messageType,
                                 isSelf: false,
                                 content: message,
                                 time: convertDate(new Date())
@@ -147,6 +153,10 @@ worker.onmessage = function getdata(e) {
                             ipPort: descriptor.ipPort,
                             isOnline: descriptor.isOnline
                          }
+                         store.dispatch({
+                            type: INITIATE_FRIEND_CHAT_RECORD,
+                            id: payload.userId
+                        })
                                 store.dispatch({
                                     type: RECEIVE_CONFIRM_ADD_FRIEND,
                                     payload
@@ -286,6 +296,10 @@ ipcRenderer.on('eventFromAdd', (e, payload) => {
                     store.dispatch({ 
                         type: RESPONSE_JOIN_GROUP,
                         payload: response.data
+                    })
+                    store.dispatch({ 
+                        type: INITIATE_GROUP_CHAT_RECORD,
+                        groupId: id
                     })
                     store.dispatch({
                         type: ADD_SYSTEM_MESSAGE,

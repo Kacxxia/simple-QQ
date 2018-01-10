@@ -35,6 +35,7 @@ class ssqpBox {
     sendPacket(ip, port, cmd, descriptor, data) {
         console.log('sending packet!!!')
         console.log(ip, port, cmd, descriptor, data)
+        if (data) data = Buffer.from(data)
         this.ssqp.send(null, ip, port, cmd, descriptor, data)
     }
 

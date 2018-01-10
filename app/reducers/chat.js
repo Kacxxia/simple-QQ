@@ -130,7 +130,7 @@ function handleDetailRecord(state, action) {
         case SEND_FRIEND_CHAT_MESSAGE:     
         case SEND_FRIEND_FILE:   
             return Object.assign({}, state, {
-                [action.payload[0].userId]: state[action.payload[0].userId].concat(action.payload)
+                [action.payload[0].targetUserId]: state[action.payload[0].targetUserId].concat(action.payload)
             })
         default:
             return state

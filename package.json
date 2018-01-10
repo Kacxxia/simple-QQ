@@ -1,8 +1,8 @@
 {
-  "name": "electron-react-boilerplate",
-  "productName": "ElectronReact",
+  "name": "simple-qq",
+  "productName": "simpleQQ",
   "version": "0.12.0",
-  "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
+  "description": "simple IM desktop app like QQ",
   "scripts": {
     "build": "concurrently \"npm run build-main\" \"npm run build-renderer\"",
     "build-dll": "cross-env NODE_ENV=development node --trace-warnings -r babel-register ./node_modules/webpack/bin/webpack --config webpack.config.renderer.dev.dll.js --colors",
@@ -31,8 +31,8 @@
   },
   "browserslist": "electron 1.6",
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.develar.ElectronReact",
+    "productName": "simpleQQ",
+    "appId": "org.develar.simpleQQ",
     "files": [
       "dist/",
       "node_modules/",
@@ -189,6 +189,7 @@
     "crc": "^3.5.0",
     "devtron": "^1.4.0",
     "electron-debug": "^1.2.0",
+    "electron-packager": "^10.1.1",
     "font-awesome": "^4.7.0",
     "history": "^4.6.3",
     "prop-types": "^15.6.0",

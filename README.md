@@ -1,6 +1,7 @@
 # simple-QQ
 
 a simple instant message desktop app.
+**Issue: Request does not work after being packaged.(electron-packager)**
 
 * **protocol**: Stupid-Simple-QQ-Protocol
 * **network API**: Nodejs/net
